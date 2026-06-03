@@ -1,0 +1,131 @@
+{
+  "mode": "optimized",
+  "cohen_kappa": 1.0,
+  "rows": [
+    {
+      "id": "G001",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G002",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G003",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G004",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G005",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G006",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G007",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G008",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G009",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G010",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G011",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G012",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G013",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G014",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G015",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G016",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G017",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G018",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G019",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G020",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G021",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G022",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G023",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G024",
+      "judge_score": 1,
+      "human_label": 1
+    },
+    {
+      "id": "G025",
+      "judge_score": 1,
+      "human_label": 1
+    }
+  ]
+}

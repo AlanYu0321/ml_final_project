@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+data/audit.log
+data/memory.json
+

@@ -1,0 +1,9 @@
+{
+  "cases": 25.0,
+  "pass_rate": 1.0,
+  "expected_recall": 1.0,
+  "forbidden_rate": 0.0,
+  "citation_rate": 1.0,
+  "ragas_context_recall": 0.92,
+  "avg_latency_ms": 0.2
+}
