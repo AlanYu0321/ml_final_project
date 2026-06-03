@@ -1,14 +1,12 @@
 # Policy Ops Agent
 
-Traditional Chinese version: [README.zh-TW.md](README.zh-TW.md)
-
 Policy Ops Agent is a capstone-ready compliance assistant. It answers employee policy questions with citations, blocks unsafe requests, remembers cross-session context, creates escalation tickets, and ships with a reproducible evaluation harness.
 
 The project follows the S18 capstone requirements: working agent code, README, eval directory, 25-case golden set, unit tests, semantic metric, judge/kappa script, experiment log, result tables, and failure analysis.
 
-## S18 PDF Requirements Covered
+## Requirements Covered
 
-The source assignment is `/Users/alanyu/Documents/Pilot/ML_notes/S18__Capstone_Project_Build_Evaluate_Present_an_Agent.pdf`. Its core requirements are:
+Its core requirements are:
 
 | PDF requirement | Minimum bar | This project |
 | --- | --- | --- |
