@@ -44,6 +44,7 @@ class PolicyOpsAgent:
     def ask(self, question: str, *, user_id: str = "demo", mode: str = "optimized") -> AgentResponse:
         start = perf_counter()
         tool_calls: list[ToolCall] = []
+        mcp_start = len(self.tools.mcp_client.call_history)
         try:
             cleaned = validate_question(question)
         except SecurityError as exc:
@@ -89,13 +90,14 @@ class PolicyOpsAgent:
             )
         except SynthesisError as exc:
             return self._blocked(f"Unable to answer with retrieved policy context: {exc}", user_id, cleaned, start)
+        mcp_tools = [call.name for call in self.tools.mcp_client.call_history[mcp_start:]]
         self.audit.write(
             event_type="agent_response",
             user_id=user_id,
             question=cleaned,
             decision="answered",
             tool_calls=[call.name for call in tool_calls],
-            metadata={"citations": synthesis.citations, "mode": mode},
+            metadata={"citations": synthesis.citations, "mode": mode, "mcp_tools": mcp_tools},
         )
         return AgentResponse(
             answer=synthesis.answer,
@@ -104,7 +106,7 @@ class PolicyOpsAgent:
             blocked=False,
             decision="answered",
             latency_ms=round((perf_counter() - start) * 1000, 2),
-            metadata={"mode": mode, "retrieved": len(contexts)},
+            metadata={"mode": mode, "retrieved": len(contexts), "mcp_tools": mcp_tools},
         )
 
     def _synthesize_with_retry(

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from .mcp import MCPClient, MCPError, PolicyMCPServer
 from .memory import JsonMemoryStore
 from .retrieval import PolicyRetriever, RetrievalResult
 from .security import authorize_tool
@@ -20,9 +22,15 @@ class ToolError(RuntimeError):
 
 
 class ToolRegistry:
-    def __init__(self, retriever: PolicyRetriever, memory: JsonMemoryStore) -> None:
+    def __init__(
+        self,
+        retriever: PolicyRetriever,
+        memory: JsonMemoryStore,
+        mcp_client: MCPClient | None = None,
+    ) -> None:
         self.retriever = retriever
         self.memory = memory
+        self.mcp_client = mcp_client or MCPClient(PolicyMCPServer(retriever))
         self._tools: dict[str, Callable[..., Any]] = {
             "retrieve_policy": self.retrieve_policy,
             "create_escalation_ticket": self.create_escalation_ticket,
@@ -39,10 +47,14 @@ class ToolRegistry:
         return ToolCall(tool_name, kwargs, result)
 
     def retrieve_policy(self, query: str, top_k: int = 4, mode: str = "optimized") -> list[RetrievalResult]:
-        return self.retriever.search(query, top_k=top_k, mode=mode)
+        try:
+            return self.mcp_client.call_tool("policy.search", {"query": query, "top_k": top_k, "mode": mode})
+        except MCPError as exc:
+            raise ToolError(str(exc)) from exc
 
     def create_escalation_ticket(self, user_id: str, question_text: str, reason: str) -> dict[str, str]:
-        ticket_id = f"ESC-{abs(hash((user_id, question_text, reason))) % 100000:05d}"
+        digest = hashlib.sha256(f"{user_id}|{question_text}|{reason}".encode("utf-8")).hexdigest()
+        ticket_id = f"ESC-{int(digest[:8], 16) % 100000:05d}"
         return {"ticket_id": ticket_id, "status": "created", "reason": reason}
 
     def remember_user_context(self, user_id: str, note: str) -> dict[str, str]:

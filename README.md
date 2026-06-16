@@ -11,9 +11,9 @@ Its core requirements are:
 | PDF requirement | Minimum bar | This project |
 | --- | --- | --- |
 | GitHub/project repo | Working agent code, README, and `eval/` directory. | Source code, policy corpus, tests, eval harness, result tables, and README are included. |
-| Agent components | Use at least 3 of RAG, MCP, Tools, Multi-agent, Memory, Security/Governance. Eval does not count. | Uses 4: RAG, Tools, Memory, Security/Governance. |
+| Agent components | Use at least 3 of RAG, MCP, Tools, Multi-agent, Memory, Security/Governance. Eval does not count. | Uses 5: RAG, MCP, Tools, Memory, Security/Governance. |
 | Golden set | `eval/golden.jsonl` with at least 25 cases containing input, expected facts, forbidden facts, and tags. | `eval/golden.jsonl` has 25 cases. |
-| Deterministic unit suite | At least 8 pytest tests covering tool routing, error paths, retries, with LLM mocked. | `tests/unit/` has 12 tests, including retry with mocked synthesis. |
+| Deterministic unit suite | At least 8 pytest tests covering tool routing, error paths, retries, with LLM mocked. | `tests/unit/` has 17 tests, including MCP routing and retry with mocked synthesis. |
 | Semantic metric | At least 1 RAGAS faithfulness or context recall metric. | `eval/metrics.py` implements RAGAS-style context recall. |
 | LLM judge | Score one quality dimension and compute Cohen's kappa against a second judge/human, target kappa at least 0.6. | `eval/judge.py` computes quality labels and optimized kappa is `1.0`. |
 | Experiment | Compare baseline to optimized version, log changes and metric movement. | Baseline lexical retrieval vs optimized retrieval; experiment log included below. |
@@ -30,11 +30,12 @@ Business value: reduce policy lookup time while preserving permission boundaries
 
 ## Components Used
 
-This project uses four of the required agent components:
+This project uses five of the required agent components:
 
 | Component | Where | What it does |
 | --- | --- | --- |
 | RAG | `policy_agent/retrieval.py`, `data/policies/` | Retrieves policy chunks and returns source citations. |
+| MCP | `policy_agent/mcp.py` | Exposes policy search through a local MCP-style `policy.search` tool using `tools/list` and `tools/call`. |
 | Tools | `policy_agent/tools.py` | Calls retrieval, escalation-ticket, and memory tools through a registry. |
 | Memory | `policy_agent/memory.py` | Persists user notes across sessions in JSON. |
 | Security / Governance | `policy_agent/security.py`, `policy_agent/audit.py` | Blocks prompt injection, PII, dangerous requests, unauthorized tool use, and logs decisions. |
@@ -47,9 +48,11 @@ flowchart LR
     S -->|blocked| A[Audit log + refusal]
     S -->|allowed| R[Tool router]
     R --> T1[retrieve_policy tool]
+    T1 --> MCP[MCP client/server]
+    MCP --> PS[policy.search]
+    PS --> C[Policy chunks + citations]
     R --> T2[create_escalation_ticket tool]
     R --> T3[remember_user_context tool]
-    T1 --> C[Policy chunks + citations]
     T2 --> C
     T3 --> M[JSON memory]
     M --> G[Answer synthesizer]
@@ -63,6 +66,7 @@ flowchart LR
 | Path | Purpose |
 | --- | --- |
 | `policy_agent/agent.py` | Main orchestration class. |
+| `policy_agent/mcp.py` | Local MCP-style client/server exposing the `policy.search` tool. |
 | `policy_agent/retrieval.py` | Lexical RAG retriever with baseline and optimized modes. |
 | `policy_agent/tools.py` | Tool registry, tool routing, escalation tool. |
 | `policy_agent/security.py` | Input validation and guardrail decisions. |
@@ -74,7 +78,7 @@ flowchart LR
 | `eval/metrics.py` | Fact recall, forbidden-fact rate, citation rate, RAGAS-style context recall. |
 | `eval/judge.py` | Local judge and Cohen's kappa calculation. |
 | `eval/results/` | Generated result tables. |
-| `tests/unit/` | 12 pytest tests. |
+| `tests/unit/` | 17 pytest tests. |
 
 ## Setup
 
@@ -128,7 +132,7 @@ python3 -m pytest -q
 Current local result:
 
 ```text
-12 passed in 0.03s
+17 passed in 0.04s
 ```
 
 ## Run Evaluation
@@ -170,8 +174,8 @@ Generated outputs:
 
 | Mode | Pass rate | Expected recall | Forbidden rate | Citation rate | Context recall | Avg latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | 0.96 | 0.96 | 0.00 | 1.00 | 0.92 | 0.19 ms |
-| Optimized | 1.00 | 1.00 | 0.00 | 1.00 | 0.92 | 0.20 ms |
+| Baseline | 0.96 | 0.96 | 0.00 | 1.00 | 0.92 | 0.22 ms |
+| Optimized | 1.00 | 1.00 | 0.00 | 1.00 | 0.92 | 0.21 ms |
 
 Judge result: optimized Cohen's kappa is `1.0`, above the required `0.6` target.
 
@@ -204,8 +208,8 @@ Use this flow for the 15-minute code-first presentation:
 
 | Segment | Time | What to show |
 | --- | ---: | --- |
-| Architecture | 2 min | Mermaid diagram, four components, data flow. |
-| Code | 3 min | `agent.py`, `retrieval.py`, `security.py`, `tools.py`. |
+| Architecture | 2 min | Mermaid diagram, five components, data flow. |
+| Code | 3 min | `agent.py`, `mcp.py`, `retrieval.py`, `security.py`, `tools.py`. |
 | Business use case | 2 min | Policy guidance with permission boundaries. |
 | Eval and experiment | 5 min | `golden.jsonl`, `metrics.py`, `run_eval.py`, result CSVs. |
 | Results | 3 min | Baseline to optimized lift, kappa, failure analysis. |
